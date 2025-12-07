@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const salesRouter = require('./routes/sales');
+const transactionsRouter = require('./routes/transactionsRoutes');
 
 const app = express();
 app.use(cors());
@@ -9,6 +10,7 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 app.use('/sales', salesRouter);
+app.use('/transactions', transactionsRouter);
 
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
