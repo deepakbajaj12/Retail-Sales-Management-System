@@ -1,0 +1,10 @@
+.container{max-width:1200px;margin:0 auto;padding:16px;font-family:system-ui}
+.layout{display:flex;gap:16px}
+.filters-panel{width:280px;border:1px solid #ddd;padding:12px;border-radius:8px}
+.content{flex:1}
+.search-bar input{width:100%;padding:8px;border:1px solid #ccc;border-radius:6px}
+.sorting-dropdown{display:flex;gap:8px;margin:8px 0}
+.transactions-table{width:100%;border-collapse:collapse}
+.transactions-table th, .transactions-table td{border:1px solid #eee;padding:8px;text-align:left}
+.pagination-controls{display:flex;align-items:center;gap:12px;margin-top:12px}
+.row{display:flex;gap:8px}

@@ -1,0 +1,9 @@
+{
+  "name": "retail-sales-management-system",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "powershell -NoProfile -Command \"Start-Job -ScriptBlock { Set-Location \"backend\"; npm run dev }; Start-Job -ScriptBlock { Set-Location \"frontend\"; npm run dev }; Receive-Job -Wait *\"",
+    "install:all": "powershell -NoProfile -Command \"Set-Location backend; npm install; Set-Location ..; Set-Location frontend; npm install\""
+  }
+}
