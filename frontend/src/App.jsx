@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SearchBar from './components/SearchBar'
 import FiltersPanel from './components/FiltersPanel'
 import SortingDropdown from './components/SortingDropdown'
