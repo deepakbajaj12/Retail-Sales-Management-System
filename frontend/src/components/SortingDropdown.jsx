@@ -1,3 +1,4 @@
+import React from 'react'
 export default function SortingDropdown({ sort, order, onChange }) {
   const update = (changes) => onChange({ ...changes })
   return (

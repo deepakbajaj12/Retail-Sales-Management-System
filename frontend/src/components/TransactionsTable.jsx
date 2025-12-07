@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function TransactionsTable({ items }) {
   if (!items || items.length === 0) {
     return <div>No results found.</div>

@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function PaginationControls({ page, totalPages, onPageChange }) {
   return (
     <div className="pagination-controls">

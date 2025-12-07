@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function SearchBar({ value, onChange }) {
   return (
     <div className="search-bar">

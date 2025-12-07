@@ -1,3 +1,5 @@
+import React from 'react'
+
 export default function FiltersPanel({ state, onChange }) {
   const set = (k, v) => onChange({ [k]: v })
   const listInput = (val, setter, placeholder) => (
