@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node ./src/index.js",
     "dev": "nodemon ./src/index.js",
-    "test": "node ./tests/run.js"
+    "test": "node ./tests/run.js",
+    "lint": "node -e \"console.log('No ESLint configured yet')\""
   },
   "dependencies": {
     "cors": "^2.8.5",
