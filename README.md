@@ -26,3 +26,7 @@ A full-stack system demonstrating search, filters, sorting, and pagination over 
 - Backend: `cd backend; npm install; npm run dev`
 - Frontend: `cd frontend; npm install; npm run dev`
 - Configure `frontend/.env` with `VITE_API_URL=http://localhost:4000`.
+
+## Repository & CI
+- Repo: https://github.com/deepakbajaj12/Retail-Sales-Management-System
+- CI: ![CI](https://github.com/deepakbajaj12/Retail-Sales-Management-System/actions/workflows/ci.yml/badge.svg)
