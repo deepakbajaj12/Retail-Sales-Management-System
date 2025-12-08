@@ -18,7 +18,7 @@ function buildQuery(state) {
 
 export async function fetchSales(state) {
   const qs = buildQuery(state)
-  const res = await fetch(`${BASE_URL}/sales?${qs}`)
+  const res = await fetch(`${BASE_URL}/api/transactions?${qs}`)
   if (!res.ok) throw new Error('Failed to fetch')
   return res.json()
 }
