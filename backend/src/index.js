@@ -20,6 +20,19 @@ app.use(express.json());
 // Health endpoint
 app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
+// Root info
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Retail Sales Management System backend',
+    status: 'ok',
+    endpoints: {
+      health: '/health',
+      sales: '/sales',
+      transactions: '/api/transactions'
+    }
+  });
+});
+
 async function start() {
   try {
     await connectMongo();
