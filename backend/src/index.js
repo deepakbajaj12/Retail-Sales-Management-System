@@ -1,46 +1,61 @@
 const express = require('express');
 const cors = require('cors');
-const { loadCSV } = require('./utils/csvLoader');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+require('dotenv').config();
+
 const transactionsRoutes = require('./routes/transactionsRoutes');
 const salesRoutes = require('./routes/sales');
+const { connectMongo } = require('./config/db');
 
 const app = express();
 app.use(cors());
+app.use(helmet());
+app.use(compression());
+const limiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
+app.use(limiter);
 app.use(express.json());
 
-const DATA_PATH = __dirname + '/../data/sales.csv';
+// Health endpoint
+app.get('/health', (req, res) => res.json({ status: 'ok' }));
 
-loadCSV(DATA_PATH).then(data => {
-  console.log('CSV loaded records:', data.length);
-  app.locals.transactions = data;
-
+async function start() {
   try {
+    await connectMongo();
+
     // Primary routes
     app.use('/sales', salesRoutes);
-    console.log('Mounted /sales');
+    app.use('/api/transactions', salesRoutes); // alias
 
-    // Alias to support alternate path expectations
-    app.use('/api/transactions', salesRoutes);
-    console.log('Mounted alias /api/transactions -> /sales');
-  } catch (e) {
-    console.error('Failed to mount transactionsRoutes:', e);
+    // Debug sample from DB
+    const { Transaction } = require('./models/Transaction');
+    app.get('/debug/transactions-sample', async (req, res) => {
+      try {
+        const sample = await Transaction.find({}).sort({ dateTs: -1 }).limit(5).lean();
+        const total = await Transaction.estimatedDocumentCount();
+        res.json({ sample, total });
+      } catch (e) {
+        res.status(500).json({ error: 'Debug sample failed' });
+      }
+    });
+
+    const port = process.env.PORT || 4000;
+    const server = app.listen(port, () => {
+      console.log(`Backend listening on port ${port}`);
+    });
+
+    // Graceful shutdown
+    const shutdown = () => {
+      console.log('Shutting down...');
+      server.close(() => process.exit(0));
+    };
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
+  } catch (err) {
+    console.error('Startup error:', err);
+    process.exit(1);
   }
+}
 
-  // Health endpoint
-  app.get('/health', (req, res) => res.json({ status: 'ok' }));
-
-  app.get('/debug/transactions-sample', (req, res) => {
-    const sample = (app.locals.transactions || []).slice(0, 5);
-    res.json({ sample, total: (app.locals.transactions || []).length });
-  });
-
-  // Optional debug sample endpoint (kept for local troubleshooting)
-
-  const port = process.env.PORT || 4000;
-  app.listen(port, () => {
-    console.log(`Backend listening on port ${port}`);
-  });
-}).catch(err => {
-  console.error('Failed to load CSV:', err);
-  process.exit(1);
-});
+start();
