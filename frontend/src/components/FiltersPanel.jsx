@@ -2,28 +2,59 @@ import React from 'react'
 
 export default function FiltersPanel({ state, onChange }) {
   const set = (k, v) => onChange({ [k]: v })
-  const listInput = (val, setter, placeholder) => (
-    <input type="text" placeholder={placeholder} value={(val||[]).join(', ')} onChange={(e) => setter(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} />
+
+  const toggleMulti = (key, value) => {
+    const cur = new Set(state[key] || [])
+    if (cur.has(value)) cur.delete(value)
+    else cur.add(value)
+    set(key, Array.from(cur))
+  }
+
+  const regions = ['North', 'South', 'East', 'West']
+  const genders = ['Male', 'Female', 'Other']
+  const categories = ['Electronics', 'Apparel', 'Grocery', 'Home']
+  const tags = ['New', 'Sale', 'Hot', 'Featured']
+  const paymentMethods = ['Cash', 'Card', 'UPI']
+
+  const renderCheckboxes = (key, options) => (
+    <div className="checkbox-group">
+      {options.map(opt => (
+        <label key={opt} className="checkbox-item">
+          <input
+            type="checkbox"
+            checked={(state[key] || []).includes(opt)}
+            onChange={() => toggleMulti(key, opt)}
+          />
+          {opt}
+        </label>
+      ))}
+    </div>
   )
 
   return (
     <div className="filters-panel">
       <h3>Filters</h3>
       <label>Customer Region</label>
-      {listInput(state.regions, (v)=>set('regions', v), 'e.g., North, South')}
+      {renderCheckboxes('regions', regions)}
+
       <label>Gender</label>
-      {listInput(state.genders, (v)=>set('genders', v), 'e.g., Male, Female')}
+      {renderCheckboxes('genders', genders)}
+
       <label>Age Range</label>
       <div className="row">
         <input type="number" placeholder="Min" value={state.ageMin || ''} onChange={(e)=>set('ageMin', e.target.value?Number(e.target.value):'')} />
         <input type="number" placeholder="Max" value={state.ageMax || ''} onChange={(e)=>set('ageMax', e.target.value?Number(e.target.value):'')} />
       </div>
+
       <label>Product Category</label>
-      {listInput(state.categories, (v)=>set('categories', v), 'e.g., Electronics, Apparel')}
+      {renderCheckboxes('categories', categories)}
+
       <label>Tags</label>
-      {listInput(state.tags, (v)=>set('tags', v), 'e.g., New, Sale')}
+      {renderCheckboxes('tags', tags)}
+
       <label>Payment Method</label>
-      {listInput(state.paymentMethods, (v)=>set('paymentMethods', v), 'e.g., Cash, Card')}
+      {renderCheckboxes('paymentMethods', paymentMethods)}
+
       <label>Date Range</label>
       <div className="row">
         <input type="date" value={state.dateFrom || ''} onChange={(e)=>set('dateFrom', e.target.value)} />
