@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Transaction } = require('../src/models/Transaction');
-const { querySales } = require('../src/services/salesService');
+const { querySales, getDashboardStats } = require('../src/services/salesService');
 
 module.exports = async function() {
   // Start in-memory Mongo
@@ -84,6 +84,13 @@ module.exports = async function() {
     const res9b = await querySales({ categories: ['Electronics'], page: 2, pageSize: 1 });
     if (res9a.items.length !== 1 || res9b.items.length !== 1) throw new Error('Pagination failed');
     if (res9a.items[0].productId === res9b.items[0].productId) throw new Error('Pagination returned same item');
+
+    // Dashboard Stats
+    const stats = await getDashboardStats();
+    if (stats.totalSales !== 1790) throw new Error(`Stats totalSales failed: expected 1790, got ${stats.totalSales}`);
+    if (stats.totalQuantity !== 6) throw new Error(`Stats totalQuantity failed: expected 6, got ${stats.totalQuantity}`);
+    if (stats.totalTransactions !== 3) throw new Error('Stats totalTransactions failed');
+    if (Math.abs(stats.averageTransactionValue - 596.666) > 0.01) throw new Error(`Stats avg value failed: ${stats.averageTransactionValue}`);
 
   } finally {
     await mongoose.disconnect();

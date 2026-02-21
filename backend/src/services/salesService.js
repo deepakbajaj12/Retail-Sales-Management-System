@@ -89,4 +89,26 @@ async function querySales(query) {
   };
 }
 
-module.exports = { querySales };
+async function getDashboardStats() {
+  const [totalSalesResult, totalQuantityResult, totalTransactions] = await Promise.all([
+    Transaction.aggregate([
+      { $group: { _id: null, totalAmount: { $sum: '$finalAmount' } } }
+    ]),
+    Transaction.aggregate([
+      { $group: { _id: null, totalQuantity: { $sum: '$quantity' } } }
+    ]),
+    Transaction.countDocuments()
+  ]);
+
+  const totalSales = totalSalesResult[0]?.totalAmount || 0;
+  const totalQuantity = totalQuantityResult[0]?.totalQuantity || 0;
+
+  return {
+    totalSales,
+    totalTransactions,
+    totalQuantity,
+    averageTransactionValue: totalTransactions > 0 ? totalSales / totalTransactions : 0
+  };
+}
+
+module.exports = { querySales, getDashboardStats };
