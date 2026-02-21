@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Transaction } = require('../src/models/Transaction');
-const { querySales, getDashboardStats } = require('../src/services/salesService');
+const { querySales, getDashboardStats, getTransactionById } = require('../src/services/salesService');
 
 module.exports = async function() {
   // Start in-memory Mongo
@@ -91,6 +91,14 @@ module.exports = async function() {
     if (stats.totalQuantity !== 6) throw new Error(`Stats totalQuantity failed: expected 6, got ${stats.totalQuantity}`);
     if (stats.totalTransactions !== 3) throw new Error('Stats totalTransactions failed');
     if (Math.abs(stats.averageTransactionValue - 596.666) > 0.01) throw new Error(`Stats avg value failed: ${stats.averageTransactionValue}`);
+
+    // Get Transaction By ID
+    const sampleId = res9a.items[0]._id;
+    const singleTx = await getTransactionById(sampleId);
+    if (!singleTx || String(singleTx._id) !== String(sampleId)) throw new Error('Get transaction by ID failed');
+    
+    const missingTx = await getTransactionById(new mongoose.Types.ObjectId());
+    if (missingTx) throw new Error('Get by ID should retrieve nothing for new ObjectId');
 
   } finally {
     await mongoose.disconnect();

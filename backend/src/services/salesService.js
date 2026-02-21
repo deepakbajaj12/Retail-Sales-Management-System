@@ -111,4 +111,8 @@ async function getDashboardStats() {
   };
 }
 
-module.exports = { querySales, getDashboardStats };
+async function getTransactionById(id) {
+  return await Transaction.findById(id);
+}
+
+module.exports = { querySales, getDashboardStats, getTransactionById };
