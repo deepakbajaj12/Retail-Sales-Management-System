@@ -1,4 +1,10 @@
-const { querySales, getDashboardStats, getTransactionById, getFilterOptions } = require('../services/transactionsService');
+const {
+  querySales,
+  getDashboardStats,
+  getTransactionById,
+  getFilterOptions,
+  exportSales
+} = require('../services/transactionsService');
 const { validateQuery } = require('../utils/validation');
 
 async function getStats(req, res) {
@@ -35,6 +41,18 @@ async function getFilters(req, res) {
   }
 }
 
+async function exportTransactions(req, res) {
+  try {
+    const stream = exportSales(req.query);
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="transactions.csv"');
+    stream.pipe(res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Error generating export');
+  }
+}
+
 async function getTransaction(req, res) {
   try {
     const { id } = req.params;
@@ -53,4 +71,4 @@ async function getTransaction(req, res) {
   }
 }
 
-module.exports = { getTransactions, getStats, getTransaction, getFilters };
+module.exports = { getTransactions, getStats, getTransaction, getFilters, exportTransactions };

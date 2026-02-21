@@ -1,7 +1,15 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Transaction } = require('../src/models/Transaction');
-const { querySales, getDashboardStats, getTransactionById, getFilterOptions } = require('../src/services/salesService');
+const { 
+  querySales, 
+  getDashboardStats, 
+  getTransactionById, 
+  getFilterOptions,
+  exportSales 
+} = require('../src/services/salesService');
+// Mock callback for streams
+const { Writable } = require('stream');
 
 module.exports = async function() {
   // Start in-memory Mongo
@@ -105,6 +113,22 @@ module.exports = async function() {
     if (!options.regions.includes('North') || !options.regions.includes('South')) throw new Error('Filter options regions failed');
     if (!options.categories.includes('Electronics') || !options.categories.includes('Apparel')) throw new Error('Filter options categories failed');
     if (options.storeLocations.length !== 3) throw new Error('Filter options storeLocations failed count');
+
+    // Export Sales stream test
+    const exportStream = exportSales({ regions: ['North'] });
+    let csvData = '';
+    
+    // We can't await a stream directly, but we can wrap it in a promise
+    await new Promise((resolve, reject) => {
+      exportStream.on('data', chunk => csvData += chunk);
+      exportStream.on('end', resolve);
+      exportStream.on('error', reject);
+    });
+
+    if (!csvData.includes('customerName,phoneNumber')) throw new Error('CSV export missing header');
+    if (!csvData.includes('John Doe')) throw new Error('CSV export missing expected record');
+    // Ensure filtered out records are absent
+    if (csvData.includes('Jane Smith')) throw new Error('CSV export query params ignored (record should be filtered out)');
 
   } finally {
     await mongoose.disconnect();

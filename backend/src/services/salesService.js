@@ -1,5 +1,7 @@
 const { Transaction } = require('../models/Transaction');
 
+const { stringify } = require('csv-stringify');
+
 function arr(v) {
   if (v == null) return [];
   if (Array.isArray(v)) return v.filter(Boolean);
@@ -20,7 +22,7 @@ function dateParam(v) {
   return isNaN(d.getTime()) ? null : d.getTime();
 }
 
-async function querySales(query) {
+function buildMongoFilter(query) {
   const q = query.q || '';
   const filters = {
     regions: arr(query.regions),
@@ -34,12 +36,6 @@ async function querySales(query) {
     dateTo: dateParam(query.dateTo),
   };
 
-  const sortKey = query.sort || 'date';
-  const order = (query.order || (sortKey === 'date' ? 'desc' : 'asc')).toLowerCase();
-  const pageSize = Math.min(Number(query.pageSize) || 10, 100);
-  const page = Math.max(Number(query.page) || 1, 1);
-
-  // Build Mongo filter
   const mongoFilter = {};
 
   if (q && q.trim()) {
@@ -64,6 +60,15 @@ async function querySales(query) {
     if (filters.dateFrom != null) mongoFilter.dateTs.$gte = filters.dateFrom;
     if (filters.dateTo != null) mongoFilter.dateTs.$lte = filters.dateTo;
   }
+  return mongoFilter;
+}
+
+async function querySales(query) {
+  const mongoFilter = buildMongoFilter(query);
+  const sortKey = query.sort || 'date';
+  const order = (query.order || (sortKey === 'date' ? 'desc' : 'asc')).toLowerCase();
+  const pageSize = Math.min(Number(query.pageSize) || 10, 100);
+  const page = Math.max(Number(query.page) || 1, 1);
 
   // Sorting map
   const sortMap = {
@@ -131,4 +136,21 @@ async function getFilterOptions() {
   };
 }
 
-module.exports = { querySales, getDashboardStats, getTransactionById, getFilterOptions };
+function exportSalesStream(query) {
+  const mongoFilter = buildMongoFilter(query);
+  const cursor = Transaction.find(mongoFilter).lean().cursor();
+  
+  const stringifier = stringify({
+    header: true,
+    columns: [
+      'customerName', 'phoneNumber', 'gender', 'age', 'customerRegion', 
+      'productCategory', 'productName', 'quantity', 'finalAmount', 
+      'orderStatus', 'date', 'paymentMethod'
+    ]
+  });
+
+  cursor.pipe(stringifier);
+  return stringifier;
+}
+
+module.exports = { querySales, getDashboardStats, getTransactionById, getFilterOptions, exportSales: exportSalesStream };
