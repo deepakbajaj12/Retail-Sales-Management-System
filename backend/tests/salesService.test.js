@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Transaction } = require('../src/models/Transaction');
-const { querySales, getDashboardStats, getTransactionById } = require('../src/services/salesService');
+const { querySales, getDashboardStats, getTransactionById, getFilterOptions } = require('../src/services/salesService');
 
 module.exports = async function() {
   // Start in-memory Mongo
@@ -99,6 +99,12 @@ module.exports = async function() {
     
     const missingTx = await getTransactionById(new mongoose.Types.ObjectId());
     if (missingTx) throw new Error('Get by ID should retrieve nothing for new ObjectId');
+
+    // Get Filter Options
+    const options = await getFilterOptions();
+    if (!options.regions.includes('North') || !options.regions.includes('South')) throw new Error('Filter options regions failed');
+    if (!options.categories.includes('Electronics') || !options.categories.includes('Apparel')) throw new Error('Filter options categories failed');
+    if (options.storeLocations.length !== 3) throw new Error('Filter options storeLocations failed count');
 
   } finally {
     await mongoose.disconnect();

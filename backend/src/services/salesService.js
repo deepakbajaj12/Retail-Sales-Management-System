@@ -115,4 +115,20 @@ async function getTransactionById(id) {
   return await Transaction.findById(id);
 }
 
-module.exports = { querySales, getDashboardStats, getTransactionById };
+async function getFilterOptions() {
+  const [regions, categories, paymentMethods, storeLocations] = await Promise.all([
+    Transaction.distinct('customerRegion'),
+    Transaction.distinct('productCategory'),
+    Transaction.distinct('paymentMethod'),
+    Transaction.distinct('storeLocation')
+  ]);
+
+  return {
+    regions: regions.filter(Boolean).sort(),
+    categories: categories.filter(Boolean).sort(),
+    paymentMethods: paymentMethods.filter(Boolean).sort(),
+    storeLocations: storeLocations.filter(Boolean).sort()
+  };
+}
+
+module.exports = { querySales, getDashboardStats, getTransactionById, getFilterOptions };

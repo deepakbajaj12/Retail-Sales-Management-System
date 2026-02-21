@@ -1,4 +1,4 @@
-const { querySales, getDashboardStats, getTransactionById } = require('../services/transactionsService');
+const { querySales, getDashboardStats, getTransactionById, getFilterOptions } = require('../services/transactionsService');
 const { validateQuery } = require('../utils/validation');
 
 async function getStats(req, res) {
@@ -25,6 +25,16 @@ async function getTransactions(req, res) {
   }
 }
 
+async function getFilters(req, res) {
+  try {
+    const filters = await getFilterOptions();
+    res.json(filters);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
+
 async function getTransaction(req, res) {
   try {
     const { id } = req.params;
@@ -43,4 +53,4 @@ async function getTransaction(req, res) {
   }
 }
 
-module.exports = { getTransactions, getStats, getTransaction };
+module.exports = { getTransactions, getStats, getTransaction, getFilters };
