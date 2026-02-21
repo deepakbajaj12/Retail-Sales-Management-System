@@ -3,6 +3,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 require('dotenv').config();
 
 const transactionsRoutes = require('./routes/transactionsRoutes');
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(helmet());
 app.use(compression());
+app.use(morgan('combined'));
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 120 });
 app.use(limiter);
 app.use(express.json());
