@@ -99,6 +99,13 @@ module.exports = async function() {
     if (stats.totalQuantity !== 6) throw new Error(`Stats totalQuantity failed: expected 6, got ${stats.totalQuantity}`);
     if (stats.totalTransactions !== 3) throw new Error('Stats totalTransactions failed');
     if (Math.abs(stats.averageTransactionValue - 596.666) > 0.01) throw new Error(`Stats avg value failed: ${stats.averageTransactionValue}`);
+    if (!Array.isArray(stats.topCategories) || stats.topCategories.length === 0) throw new Error('Stats topCategories missing');
+    if (!Array.isArray(stats.revenueByRegion) || stats.revenueByRegion.length === 0) throw new Error('Stats revenueByRegion missing');
+
+    // Filtered stats should only include matching region transactions.
+    const filteredStats = await getDashboardStats({ regions: ['North'] });
+    if (filteredStats.totalTransactions !== 1) throw new Error('Filtered stats transaction count failed');
+    if (filteredStats.totalSales !== 900) throw new Error(`Filtered stats totalSales failed: ${filteredStats.totalSales}`);
 
     // Get Transaction By ID
     const sampleId = res9a.items[0]._id;

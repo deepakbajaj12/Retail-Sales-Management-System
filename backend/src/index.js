@@ -41,7 +41,7 @@ async function start() {
 
     // Primary routes
     app.use('/sales', salesRoutes);
-    app.use('/api/transactions', salesRoutes); // alias
+    app.use('/api/transactions', transactionsRoutes);
 
     // Debug sample from DB
     const { Transaction } = require('./models/Transaction');

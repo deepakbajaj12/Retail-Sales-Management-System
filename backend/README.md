@@ -49,7 +49,11 @@ npm run dev
 ## Endpoints
 - Health: `GET /health`
 - Sales: `GET /sales` (primary)
-- Transactions alias: `GET /api/transactions` (same as `/sales`)
+- Transactions list: `GET /api/transactions` (same filtering/sorting behavior as `/sales`)
+- Filtered stats: `GET /api/transactions/stats`
+- Filter options: `GET /api/transactions/filters`
+- CSV export: `GET /api/transactions/export`
+- Transaction details: `GET /api/transactions/:id`
 - Debug sample: `GET /debug/transactions-sample`
 
 ### Query params
@@ -65,6 +69,15 @@ npm run dev
 ```
 GET /sales?q=John&regions=North,South&categories=Electronics,Apparel&sort=date&order=desc&page=1&pageSize=10
 ```
+
+### Advanced insights example
+```
+GET /api/transactions/stats?regions=North&dateFrom=2025-01-01&dateTo=2025-12-31
+```
+
+Returns high-level metrics plus breakdown arrays:
+- `topCategories[]` with revenue and transaction count
+- `revenueByRegion[]` with regional totals
 
 ## Render Deployment
 - Set env var `MONGODB_URI` in the Render service.

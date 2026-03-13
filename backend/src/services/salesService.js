@@ -94,15 +94,33 @@ async function querySales(query) {
   };
 }
 
-async function getDashboardStats() {
-  const [totalSalesResult, totalQuantityResult, totalTransactions] = await Promise.all([
+async function getDashboardStats(query = {}) {
+  const mongoFilter = buildMongoFilter(query);
+  const matchStage = Object.keys(mongoFilter).length ? [{ $match: mongoFilter }] : [];
+
+  const [totalSalesResult, totalQuantityResult, totalTransactions, topCategories, revenueByRegion] = await Promise.all([
     Transaction.aggregate([
+      ...matchStage,
       { $group: { _id: null, totalAmount: { $sum: '$finalAmount' } } }
     ]),
     Transaction.aggregate([
+      ...matchStage,
       { $group: { _id: null, totalQuantity: { $sum: '$quantity' } } }
     ]),
-    Transaction.countDocuments()
+    Transaction.countDocuments(mongoFilter),
+    Transaction.aggregate([
+      ...matchStage,
+      { $group: { _id: '$productCategory', revenue: { $sum: '$finalAmount' }, transactions: { $sum: 1 } } },
+      { $project: { _id: 0, category: '$_id', revenue: 1, transactions: 1 } },
+      { $sort: { revenue: -1 } },
+      { $limit: 5 }
+    ]),
+    Transaction.aggregate([
+      ...matchStage,
+      { $group: { _id: '$customerRegion', revenue: { $sum: '$finalAmount' } } },
+      { $project: { _id: 0, region: '$_id', revenue: 1 } },
+      { $sort: { revenue: -1 } }
+    ])
   ]);
 
   const totalSales = totalSalesResult[0]?.totalAmount || 0;
@@ -112,7 +130,9 @@ async function getDashboardStats() {
     totalSales,
     totalTransactions,
     totalQuantity,
-    averageTransactionValue: totalTransactions > 0 ? totalSales / totalTransactions : 0
+    averageTransactionValue: totalTransactions > 0 ? totalSales / totalTransactions : 0,
+    topCategories,
+    revenueByRegion
   };
 }
 

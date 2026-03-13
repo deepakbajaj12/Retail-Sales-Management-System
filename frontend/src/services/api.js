@@ -22,3 +22,15 @@ export async function fetchSales(state) {
   if (!res.ok) throw new Error('Failed to fetch')
   return res.json()
 }
+
+export async function fetchStats(state) {
+  const qs = buildQuery(state)
+  const res = await fetch(`${BASE_URL}/api/transactions/stats?${qs}`)
+  if (!res.ok) throw new Error('Failed to fetch stats')
+  return res.json()
+}
+
+export function getExportUrl(state) {
+  const qs = buildQuery(state)
+  return `${BASE_URL}/api/transactions/export?${qs}`
+}

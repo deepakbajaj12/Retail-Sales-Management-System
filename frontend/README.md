@@ -3,6 +3,11 @@
 ## Overview
 React (Vite) SPA implementing structured UI with search bar, filter panel, sorting dropdown, transactions table, and pagination controls.
 
+## Advanced Features
+- Live KPI dashboard (`total sales`, `total transactions`, `total quantity`, `average transaction value`) driven by the current filters/search.
+- Breakdown panels for `Top Categories` and `Revenue by Region`.
+- One-click `Export CSV` button that exports the currently filtered dataset from the backend.
+
 ## Tech Stack
 - React, Vite
 

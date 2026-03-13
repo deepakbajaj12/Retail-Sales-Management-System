@@ -9,7 +9,12 @@ const { validateQuery } = require('../utils/validation');
 
 async function getStats(req, res) {
   try {
-    const stats = await getDashboardStats();
+    const validation = validateQuery(req.query);
+    if (!validation.valid) {
+      return res.status(400).json({ error: validation.error });
+    }
+
+    const stats = await getDashboardStats(req.query);
     res.json(stats);
   } catch (err) {
     console.error(err);
