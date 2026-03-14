@@ -10,11 +10,23 @@ import { useQueryState } from './hooks/useQueryState'
 import { fetchSales, fetchStats, getExportUrl } from './services/api'
 
 export default function App() {
-  const { state, setState, setPage } = useQueryState()
+  const { state, setState, setPage, resetState } = useQueryState()
   const [data, setData] = useState({ items: [], page: 1, pageSize: 10, total: 0, totalPages: 0 })
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(false)
   const [statsLoading, setStatsLoading] = useState(false)
+
+  const activeFilterCount =
+    (state.q ? 1 : 0) +
+    (state.regions.length ? 1 : 0) +
+    (state.genders.length ? 1 : 0) +
+    (state.ageMin !== '' ? 1 : 0) +
+    (state.ageMax !== '' ? 1 : 0) +
+    (state.categories.length ? 1 : 0) +
+    (state.tags.length ? 1 : 0) +
+    (state.paymentMethods.length ? 1 : 0) +
+    (state.dateFrom ? 1 : 0) +
+    (state.dateTo ? 1 : 0)
 
   useEffect(() => {
     setLoading(true)
@@ -34,7 +46,12 @@ export default function App() {
       <SearchBar value={state.q} onChange={(q) => setState({ q })} />
       {statsLoading ? <div>Loading insights...</div> : <DashboardStats stats={stats} />}
       <div className="layout">
-        <FiltersPanel state={state} onChange={setState} />
+        <FiltersPanel
+          state={state}
+          onChange={setState}
+          onReset={resetState}
+          activeFilterCount={activeFilterCount}
+        />
         <div className="content">
           <div className="content-actions">
             <SortingDropdown sort={state.sort} order={state.order} onChange={(s) => setState(s)} />

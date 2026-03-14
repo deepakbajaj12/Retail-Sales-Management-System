@@ -7,6 +7,7 @@ React (Vite) SPA implementing structured UI with search bar, filter panel, sorti
 - Live KPI dashboard (`total sales`, `total transactions`, `total quantity`, `average transaction value`) driven by the current filters/search.
 - Breakdown panels for `Top Categories` and `Revenue by Region`.
 - One-click `Export CSV` button that exports the currently filtered dataset from the backend.
+- `Clear All Filters` action with active-filter count to quickly reset complex searches.
 
 ## Tech Stack
 - React, Vite

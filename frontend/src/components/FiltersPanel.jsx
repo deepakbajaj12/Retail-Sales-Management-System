@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function FiltersPanel({ state, onChange }) {
+export default function FiltersPanel({ state, onChange, onReset, activeFilterCount }) {
   const set = (k, v) => onChange({ [k]: v })
 
   const toggleMulti = (key, value) => {
@@ -33,7 +33,12 @@ export default function FiltersPanel({ state, onChange }) {
 
   return (
     <div className="filters-panel">
-      <h3>Filters</h3>
+      <div className="filters-header">
+        <h3>Filters</h3>
+        <span className="filter-count">{activeFilterCount} active</span>
+      </div>
+      <button type="button" className="clear-filters-btn" onClick={onReset}>Clear All Filters</button>
+
       <label>Customer Region</label>
       {renderCheckboxes('regions', regions)}
 

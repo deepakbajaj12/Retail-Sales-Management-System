@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
-export function useQueryState() {
-  const [state, _setState] = useState({
+function createInitialState() {
+  return {
     q: '',
     regions: [],
     genders: [],
@@ -16,12 +16,23 @@ export function useQueryState() {
     order: 'desc',
     page: 1,
     pageSize: 10
-  })
+  }
+}
+
+export function useQueryState() {
+  const [state, _setState] = useState(createInitialState())
+
   const setState = (changes) => {
     _setState(prev => ({ ...prev, ...changes, page: 1 }))
   }
+
   const setPage = (page) => {
     _setState(prev => ({ ...prev, page }))
   }
-  return { state, setState, setPage }
+
+  const resetState = () => {
+    _setState(createInitialState())
+  }
+
+  return { state, setState, setPage, resetState }
 }
